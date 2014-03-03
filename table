@@ -1,0 +1,207 @@
+-- Table
+
+cells = {}
+pageAmount = 1
+currentPage = 1
+letters = {"A", "B", "C", "D", "E", "F", "G", "H", "I"}
+menu = false
+exit = false
+w, h = term.getSize()
+
+-- Table Variable Syntax: table[page][column][row][value/position][x/y (only if position is selected before)]
+x5 = 5
+page = 1
+for y = 2, 18 do
+	for x = 1, #letters do
+		cells[#cells + 1] = {page, "", x5, y}
+		x5 = x5 + 5
+	end
+	x5 = 5
+end
+
+function drawScreen(page)
+	term.clear()
+	term.setTextColor(colors.white)
+	for y = 2, h - 1 do
+		if (y % 2) == 0 then
+			white = true
+		else
+			white = false
+		end
+		for x = 5, w - 1, 5 do
+			term.setCursorPos(x, y)
+			if white then
+				term.setBackgroundColor(colors.white)
+			else
+				term.setBackgroundColor(colors.lightGray)
+			end
+			write("     ")
+			white = not white
+		end
+	end
+	term.setBackgroundColor(colors.gray)
+	for x = 1, w do
+		term.setCursorPos(x, 1)
+		write(" ")
+		term.setCursorPos(x, h)
+		write(" ")
+	end
+	for y = 1, h do
+		term.setCursorPos(1, y)
+		write("    ")
+		term.setCursorPos(w - 1, y)
+		write("  ")
+	end
+	term.setBackgroundColor(colors.black)
+	term.setCursorPos(w, 2)
+	write("^")
+	term.setCursorPos(w, 3)
+	write("|")
+	term.setCursorPos(w, h - 2)
+	write("|")
+	term.setCursorPos(w, h - 1)
+	write("v")
+	term.setBackgroundColor(colors.gray)
+	term.setCursorPos(w - string.len("Page " .. tostring(page)) - 1, h)
+	write("Page " .. tostring(page))
+	x = 7
+	for i = 1, #letters do
+		term.setCursorPos(x, 1)
+		write(letters[i])
+		x = x + 5
+	end
+	yaxistext = (page * 17) - 17
+	y = 2
+	for i = 1, 17 do
+		if yaxistext + i < 10 then
+			term.setCursorPos(4, y)
+		elseif yaxistext + i >= 10 and yaxistext + i < 100 then
+			term.setCursorPos(3, y)
+		elseif yaxistext + i >= 100 then
+			term.setCursorPos(2, y)
+		end
+		write(yaxistext + i)
+		y = y + 1
+	end
+	term.setBackgroundColor(colors.black)
+	term.setCursorPos(1, h)
+	write("MENU")
+	term.setBackgroundColor(colors.gray)
+	term.setCursorPos(6, h)
+	write("Cell:")
+	cellsonpage = (page * 153) - 153
+	term.setTextColor(colors.black)
+	for i = cellsonpage + 1, cellsonpage + 153 do
+		if (cells[i][3] % 2) ~= 0 then
+			term.setBackgroundColor(colors.white)
+		else
+			term.setBackgroundColor(colors.lightGray)
+		end
+		term.setCursorPos(cells[i][3], cells[i][4])
+		term.write(string.sub(cells[i][2], 1, 4))
+	end
+end
+
+function click(p1, p2, p3)
+	if p2 > 0 and p2 < 5 and p3 == h then
+		menu = true
+	end
+	for i = 1, #cells do
+		if cells[i][1] == 1 and p2 >= cells[i][3] and p2 <= cells[i][3] + 4 and cells[i][4] == p3 then
+			term.setCursorPos(w - 8, h)
+			term.setBackgroundColor(colors.black)
+			term.setTextColor(colors.white)
+			write("OK")
+			term.setCursorPos(w - 5, h)
+			write("CANCEL")
+			term.setTextColor(colors.white)
+			term.setBackgroundColor(colors.gray)
+			term.setCursorPos(w - 6, h)
+			write(" ")
+			if cells[i][2] == "" then
+				text = ""
+			else
+				text = cells[i][2]
+			end
+			term.setCursorPos(13, h)
+			write(text)
+			while true do
+				event, param1, param2, param3 = os.pullEvent()
+				if event == "char" then
+					text = text .. param1
+					term.setCursorPos(13, h)
+					write(text)
+				elseif event == "mouse_click" then
+					if param2 > w - 9 and param2 < w - 6 and param3 == h then
+						cells[i][2] = text
+						break
+					elseif param2 > w - 6 and param2 < w + 1 and param3 == h then
+						break
+					end
+				end
+			end
+		end
+	end
+end
+
+drawScreen(currentPage)
+
+while not exit do
+	event, param1, param2, param3 = os.pullEvent()
+	if event == "mouse_click" then
+		click(param1, param2, param3)
+	end
+	drawScreen(currentPage)
+	if menu then
+		menu = false
+		term.setTextColor(colors.black)
+		term.setBackgroundColor(colors.white)
+		term.clear()
+		term.setBackgroundColor(colors.lightGray)
+		term.setCursorPos(2, 2)
+		write("    ")
+		term.setCursorPos(2, 4)
+		write("    ")
+		term.setCursorPos(2, 6)
+		write("     ")
+		term.setBackgroundColor(colors.white)
+		term.setCursorPos(2, 2)
+		write("Save")
+		term.setCursorPos(2, 4)
+		write("Open")
+		term.setCursorPos(2, 6)
+		write("Close")
+		term.setCursorPos(2, 8)
+		write("Menu will be better in next version!")
+		event, param1, param2, param3 = os.pullEvent()
+		while true do
+			if event == "mouse_click" then
+				if param3 == 2 then
+					term.clear()
+					term.setCursorPos(2, 2)
+					write("File name: ")
+					filename = read()
+					file = fs.open(filename, "w")
+					file.write(textutils.serialize(cells))
+					file.close()
+					drawScreen(currentPage)
+					break
+				elseif param3 == 4 then
+					term.clear()
+					term.setCursorPos(2, 2)
+					write("File name: ")
+					filename = read()
+					file = fs.open(filename, "r")
+					filelines = file.readAll()
+					cells = textutils.unserialize(filelines)
+					file.close()
+					drawScreen(currentPage)
+					break
+				elseif param3 == 6 then
+					exit = true
+					break
+				end
+			end
+		end
+	end
+end
