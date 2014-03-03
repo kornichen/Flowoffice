@@ -6,6 +6,7 @@ currentPage = 1
 letters = {"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 menu = false
 exit = false
+saved = true
 w, h = term.getSize()
 
 -- Table Variable Syntax: table[page][column][row][value/position][x/y (only if position is selected before)]
@@ -127,6 +128,20 @@ function click(p1, p2, p3)
 			write(text)
 			while true do
 				event, param1, param2, param3 = os.pullEvent()
+				if event == "key" then
+					if param1 == 14 then
+						term.setCursorPos(13, h)
+						for i = 1, string.len(text) do
+							write(" ")
+						end
+						text = string.sub(text, 1, string.len(text) - 1)
+						term.setCursorPos(13, h)
+						write(text)
+					elseif param1 == 28 then
+						cells[i][2] = text
+						break
+					end
+				end
 				if event == "char" then
 					text = text .. param1
 					term.setCursorPos(13, h)
@@ -134,10 +149,227 @@ function click(p1, p2, p3)
 				elseif event == "mouse_click" then
 					if param2 > w - 9 and param2 < w - 6 and param3 == h then
 						cells[i][2] = text
+						saved = false
 						break
 					elseif param2 > w - 6 and param2 < w + 1 and param3 == h then
 						break
 					end
+				end
+			end
+		end
+	end
+end
+
+function drawButton(x1, y1, text)
+	for y = y1, y1 + 3 do
+		for x = x1, x1 + 1 + string.len(text) do
+			term.setCursorPos(x, y)
+			write(" ")
+		end
+	end
+	term.setCursorPos(x1 + 1, y1 + 1)
+	write(text)
+end
+
+function showDialog(title, text, type)
+	if type == "yesnocancel" then
+		term.setTextColor(colors.white)
+		term.setBackgroundColor(colors.gray)
+		term.setCursorPos(w - (w/2) - 10, h - (h/2) - 4)
+		for i = 1, 22 do
+			write(" ")
+		end
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 4)
+		write(title)
+		term.setBackgroundColor(colors.lightGray)
+		for y = h - (h/2) - 3, h - (h/2) + 6 do
+			for x = w - (w/2) - 10, w - (w/2) + 11 do
+				term.setCursorPos(x, y)
+				write(" ")
+			end
+		end
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 2)
+		write(string.sub(text, 1, 20))
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 1)
+		write(string.sub(text, 21, 40))
+		term.setCursorPos(w - (w/2) - 9, h - (h/2))
+		write(string.sub(text, 41, 60))
+		term.setBackgroundColor(colors.black)
+		term.setCursorPos(w - (w/2) - 6, h - (h/2) + 6)
+		write("YES")
+		term.setCursorPos(w - (w/2) - 2, h - (h/2) + 6)
+		write("NO")
+		term.setCursorPos(w - (w/2) + 1, h - (h/2) + 6)
+		write("CANCEL")
+	elseif type == "ok" then
+		term.setTextColor(colors.white)
+		term.setBackgroundColor(colors.gray)
+		term.setCursorPos(w - (w/2) - 10, h - (h/2) - 4)
+		for i = 1, 22 do
+			write(" ")
+		end
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 4)
+		write(title)
+		term.setBackgroundColor(colors.lightGray)
+		for y = h - (h/2) - 3, h - (h/2) + 6 do
+			for x = w - (w/2) - 10, w - (w/2) + 11 do
+				term.setCursorPos(x, y)
+				write(" ")
+			end
+		end
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 2)
+		write(string.sub(text, 1, 20))
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 1)
+		write(string.sub(text, 21, 40))
+		term.setCursorPos(w - (w/2) - 9, h - (h/2))
+		write(string.sub(text, 41, 60))
+		term.setBackgroundColor(colors.black)
+		term.setCursorPos(w - (w/2), h - (h/2) + 6)
+		write("OK")
+	elseif type == "input" then
+		term.setTextColor(colors.white)
+		term.setBackgroundColor(colors.gray)
+		term.setCursorPos(w - (w/2) - 10, h - (h/2) - 4)
+		for i = 1, 22 do
+			write(" ")
+		end
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 4)
+		write(title)
+		term.setBackgroundColor(colors.lightGray)
+		for y = h - (h/2) - 3, h - (h/2) + 6 do
+			for x = w - (w/2) - 10, w - (w/2) + 11 do
+				term.setCursorPos(x, y)
+				write(" ")
+			end
+		end
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 2)
+		write(string.sub(text, 1, 20))
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) - 1)
+		write(string.sub(text, 21, 40))
+		term.setCursorPos(w - (w/2) - 9, h - (h/2))
+		write(string.sub(text, 41, 60))
+		term.setBackgroundColor(colors.gray)
+		term.setCursorPos(w - (w/2) - 9, h - (h/2) + 2)
+		for i = 1, 20 do
+			write(" ")
+		end
+		term.setBackgroundColor(colors.black)
+		term.setCursorPos(w - (w/2) - 3, h - (h/2) + 6)
+		write("OK")
+		term.setCursorPos(w - (w/2), h - (h/2) + 6)
+		write("CANCEL")
+	end
+	text = ""
+	while true do
+		if type == "yesnocancel" then
+			event, param1, param2, param3 = os.pullEvent()
+			if event == "mouse_click" then
+				if param2 > w - (w/2) - 6 and param2 < w - (w/2) - 3 and param3 == h - (h/2) + 6 then
+					return true
+				elseif param2 > w - (w/2) - 2 and param2 < w - (w/2) and param3 == h - (h/2) + 6 then
+					return false
+				elseif param2 > w - (w/2) and param2 < w - (w/2) + 7 and param3 == h - (h/2) + 6 then
+					return 0
+				end
+			end
+			return true
+		elseif type == "ok" then
+			event, param1, param2, param3 = os.pullEvent()
+			if event == "mouse_click" then
+				if param2 > w - (w/2) and param2 < w - (w/2) + 2 and param3 == h - (h/2) + 6 then
+					return true
+				end
+			end
+		elseif type == "input" then
+			event, param1, param2, param3 = os.pullEvent()
+			if event == "key" then
+				if param1 == 14 then
+					text = string.sub(text, 1, string.len(text) - 1)
+				end
+			end
+			if event == "mouse_click" then
+				if param2 > w - (w/2) - 3 and param2 < w - (w/2) - 1 and param3 == h - (h/2) + 6 then
+					return text
+				elseif param2 > w - (w/2) and param2 < w - (w/2) + 6 and param3 == h - (h/2) + 6 then
+					return 0
+				end
+			elseif event == "char" then
+				text = text .. param1
+			end
+			term.setTextColor(colors.white)
+			term.setBackgroundColor(colors.gray)
+			term.setCursorPos(w - (w/2) - 9, h - (h/2) + 2)
+			for i = 1, 20 do
+				write(" ")
+			end
+			term.setCursorPos(w - (w/2) - 9, h - (h/2) + 2)
+			write(text)
+		end
+	end
+end
+
+function showMenu()
+	term.setTextColor(colors.white)
+	term.setBackgroundColor(colors.white)
+	term.clear()
+	term.setBackgroundColor(colors.lightGray)
+	drawButton(1, 2, "Load")
+	drawButton(w - 1 - string.len("Save"), 2, "Save")
+	drawButton(1, 7, "Help")
+	drawButton(w - 1 - string.len("Info"), 7, "Info")
+	drawButton(1, 12, "Exit")
+	while true do
+		event, param1, param2, param3 = os.pullEvent()
+		if event == "mouse_click" then
+			if param2 > 0 and param2 < 7 and param3 > 1 and param3 < 6 then
+				input = 0
+				while input == 0 do
+					input = showDialog("Save file", "Enter the path of your file", "input")
+				end
+				file = fs.open(input, "r")
+				filelines = file.readAll()
+				cells = textutils.unserialize(filelines)
+				file.close()
+				saved = true
+				break
+			end
+			if param2 > w - 2 - string.len("Save") and param2 < w and param3 > 1 and param3 < 6 then
+				input = 0
+				while input == 0 do
+					input = showDialog("Save file", "Enter the path of your file", "input")
+				end
+				file = fs.open(input, "w")
+				file.write(textutils.serialize(cells))
+				file.close()
+				saved = true
+				break
+			end
+			if param2 > 0 and param2 < 7 and param3 > 6 and param3 < 11 then
+				showDialog("Help", "Help will be implemented in the next version.", "ok")
+				break
+			end
+			if param2 > w - 2 - string.len("Save") and param2 < w and param3 > 6 and param3 < 11 then
+				showDialog("Info", 'Written by A. "kornichen" Korn  (c) 2014 A. Korn. All rights reserved.', "ok")
+				break
+			end
+			if param2 > 0 and param2 < 7 and param3 > 11 and param3 < 16 then
+				input = showDialog("Exit without saving?", "Do you want to save the opened file before exiting?", "yesnocancel")
+				if input == true then
+					input = 0
+					while input == 0 do
+						input = showDialog("Save file", "Enter the path of your file", "input")
+					end
+					file = fs.open(input, "w")
+					file.write(textutils.serialize(cells))
+					file.close()
+					saved = true
+					exit = true
+					break
+				elseif input == false then
+					exit = true
+					break
+				elseif input == 0 then
+					break
 				end
 			end
 		end
@@ -154,54 +386,6 @@ while not exit do
 	drawScreen(currentPage)
 	if menu then
 		menu = false
-		term.setTextColor(colors.black)
-		term.setBackgroundColor(colors.white)
-		term.clear()
-		term.setBackgroundColor(colors.lightGray)
-		term.setCursorPos(2, 2)
-		write("    ")
-		term.setCursorPos(2, 4)
-		write("    ")
-		term.setCursorPos(2, 6)
-		write("     ")
-		term.setBackgroundColor(colors.white)
-		term.setCursorPos(2, 2)
-		write("Save")
-		term.setCursorPos(2, 4)
-		write("Open")
-		term.setCursorPos(2, 6)
-		write("Close")
-		term.setCursorPos(2, 8)
-		write("Menu will be better in next version!")
-		event, param1, param2, param3 = os.pullEvent()
-		while true do
-			if event == "mouse_click" then
-				if param3 == 2 then
-					term.clear()
-					term.setCursorPos(2, 2)
-					write("File name: ")
-					filename = read()
-					file = fs.open(filename, "w")
-					file.write(textutils.serialize(cells))
-					file.close()
-					drawScreen(currentPage)
-					break
-				elseif param3 == 4 then
-					term.clear()
-					term.setCursorPos(2, 2)
-					write("File name: ")
-					filename = read()
-					file = fs.open(filename, "r")
-					filelines = file.readAll()
-					cells = textutils.unserialize(filelines)
-					file.close()
-					drawScreen(currentPage)
-					break
-				elseif param3 == 6 then
-					exit = true
-					break
-				end
-			end
-		end
+		showMenu()
 	end
 end
